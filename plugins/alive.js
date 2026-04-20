@@ -1,71 +1,57 @@
-const { cmd } = require('../command');
+const { cmd, commands } = require('../command');
+const os = require("os");
+const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "alive",
-    alias: ["bot", "online"],
-    desc: "Check if bot is active with buttons",
+    alias: ["status", "runtime", "uptime"],
+    desc: "Check uptime and system status",
     category: "main",
     react: "👋",
     filename: __filename
 },
-async (conn, mek, m, { from, prefix, reply }) => {
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, sendButton }) => {
     try {
-        // Button definition
+        // පද්ධති තොරතුරු සකස් කිරීම
+        const statusText = `╭━━〔 *𝐇𝐀𝐒𝐇𝐀𝐍-𝐌𝐃* 〕━━┈⊷
+┃◈╭─────────────·๏
+┃◈┃• *👋 ʜɪ*: ${pushname}
+┃◈┃• *⏳ ᴜᴘᴛɪᴍᴇ*:  ${runtime(process.uptime())} 
+┃◈┃• *📟 ʀᴀᴍ*: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB
+┃◈┃• *👨‍💻 ᴏᴡɴᴇʀ*: ᴍʀ ʜᴀꜱʜᴜᴜ </>
+┃◈└───────────┈⊷
+╰──────────────┈⊷
+
+*𝐇𝐀𝐒𝐇𝐀𝐍-𝐌𝐃 𝐌𝐔𝐋𝐓𝐈 𝐃𝐄𝐕𝐈𝐂𝐄 𝐖𝐇𝐀𝐓𝐒𝐀𝐏𝐏 𝐁𝐎𝐓 𝐂𝐑𝐄𝐀𝐓𝐄𝐃 𝐁𝐘 𝐌𝐑 𝐇𝐀𝐒𝐇𝐔𝐔*`;
+
+        const footerText = "> *𝗣𝗢𝗪𝗘𝗥𝗘𝗗 𝗕𝗬 𝗛𝗔𝗦𝗛𝗔𝗡-𝗠𝗗 𝗩𝗘𝗥𝗦𝗜𝗢𝗡 1*";
+
+        // බොත්තම් සකස් කිරීම
         const buttons = [
             {
                 name: "quick_reply",
                 buttonParamsJson: JSON.stringify({
-                    display_text: "📜 MENU",
-                    id: `${prefix}menu`
+                    display_text: "GET MENU 🛠️",
+                    id: ".menu"
                 })
             },
             {
-                name: "quick_reply",
+                name: "cta_url",
                 buttonParamsJson: JSON.stringify({
-                    display_text: "👤 OWNER",
-                    id: `${prefix}owner`
+                    display_text: "JOIN CHANNEL 📢",
+                    url: "https://whatsapp.com/channel/0029VazhnLzK0IBdwXG4152o"
                 })
             }
         ];
 
-        // Button message structure
-        let msg = {
-            viewOnceMessage: {
-                message: {
-                    interactiveMessage: {
-                        body: { 
-                            text: "*👋 Hello! I am Hashu-MD is Alive Now!*" 
-                        },
-                        footer: { 
-                            text: "© Created By Hashu" 
-                        },
-                        header: {
-                            title: "BOT STATUS",
-                            hasMediaAttachment: true,
-                            // Oyaage thumbnail eka mehema danna puluwan
-                            thumbnailUrl: "https://files.catbox.moe/vbo0vq.png",
-                            imageMessage: null // Image ekak danna onenam meka wenas karanna puluwan
-                        },
-                        nativeFlowMessage: {
-                            buttons: buttons
-                        },
-                        // Me thiyenne ara crash eka nawaththana safety line eka
-                        contextInfo: {
-                            mentionedJid: [m.sender], 
-                            forwardingScore: 1,
-                            isForwarded: false
-                        }
-                    }
-                }
-            }
-        };
+        // Button පණිවිඩය යැවීම
+        // සටහන: Image එකක් සමඟ Button යැවීමට නම් interactiveMessage header එකට image එක ඇතුළත් කළ යුතුය.
+        // නමුත් දැනට index.js එකේ අපි හැදුවේ text buttons නිසා මේ විදිහට පාවිච්චි කරන්න:
 
-        // Message eka relay kirima
-        await conn.relayMessage(from, msg, { messageId: mek.key.id });
+        await sendButton(statusText, footerText, buttons);
 
     } catch (e) {
-        console.log("Alive Button Error: ", e.message);
-        // Button wada nathnam normal text message ekak yawamu
-        reply("*👋 I am Alive Now!*");
+        console.error("Error in alive command:", e);
+        reply(`An error occurred: ${e.message}`);
     }
 });
