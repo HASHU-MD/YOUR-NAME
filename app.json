@@ -7,7 +7,7 @@
 
   "env": {
     "SESSION_ID": {
-      "description": "rYYhlKgS#0l5W0Sgfy8vqQhuojC9m26VTF3hwpS4PqRaO4sl0y0U",
+      "description": "7URRVbZD#tdwJZjw2uv2CIFe5UcUiAADhEt0YCwn5lSLOa4jPDP8",
       "required": true
     },  
 
@@ -17,13 +17,13 @@
     },
 
     "AUTO_REPLY": {
-      "description": "true",
-      "required": true
+      "description": "false",
+      "required": false
     },
     
     "AUTO_RECORDING": {
-      "description": "true",
-      "required": true 
+      "description": "false",
+      "required": false
     }   
 },
 
