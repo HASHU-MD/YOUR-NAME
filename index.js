@@ -71,7 +71,7 @@ console.log('𝐇𝐀𝐒𝐇𝐀𝐍-𝐌𝐃 𝐖𝐀 𝐁𝐎𝐓 𝐂𝐎�
 
 let up = `HASHAN MD Connected Successful ✅\n\nPREFIX: ${prefix}`;
 
-conn.sendMessage(ownerNumber + "@s.whatsapp.net", { image: { url: `https://d.uguu.se/OBjsOZeT.jpg` }, caption: up })
+conn.sendMessage(ownerNumber + "@s.whatsapp.net", { image: { url: `https://files.catbox.moe/vbo0vq.png` }, caption: up })
 
 }
 })
