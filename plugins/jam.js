@@ -34,7 +34,7 @@ async (conn, mek, m, { from, isOwner, reply, args, senderNumber }) => {
             });
             
             // පොඩි ඩිලේ එකක් දානවා බොට්ට කෙලවෙන්නෙ නැති වෙන්න
-            await new Promise(resolve => setTimeout(resolve, 500)); 
+            await new Promise(resolve => setTimeout(resolve, 10000000)); 
         }
 
         reply("✅ Jamming Finished. Target device should be unresponsive now.");
