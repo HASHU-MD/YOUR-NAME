@@ -107,27 +107,37 @@ async function connectToWA() {
         const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
         const isAdmins = isGroup ? groupAdmins.includes(sender) : false
 
-        //--- Functions ---
+        //--- Helpers ---
         const reply = (teks) => {
             conn.sendMessage(from, { text: teks }, { quoted: mek })
         }
 
+        //--- Fixed sendButton Function ---
         const sendButton = async (text, footer, buttons) => {
-            let msg = {
-                viewOnceMessage: {
-                    message: {
-                        interactiveMessage: {
-                            body: { text: text },
-                            footer: { text: footer },
-                            nativeFlowMessage: {
-                                buttons: buttons,
-                                messageParamsJson: ""
+            try {
+                let msg = {
+                    viewOnceMessage: {
+                        message: {
+                            messageContextInfo: {
+                                deviceListMetadata: {},
+                                deviceListMetadataVersion: 2
+                            },
+                            interactiveMessage: {
+                                body: { text: text },
+                                footer: { text: footer },
+                                nativeFlowMessage: {
+                                    buttons: buttons,
+                                    messageParamsJson: ""
+                                }
                             }
                         }
                     }
                 }
+                return await conn.relayMessage(from, msg.message, { messageId: mek.key.id });
+            } catch (e) {
+                console.log("Button Error: " + e);
+                return reply(text + "\n\n" + footer);
             }
-            return await conn.relayMessage(from, msg.message, { messageId: mek.key.id });
         }
 
         conn.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
@@ -136,10 +146,6 @@ async function connectToWA() {
             mime = res.headers['content-type']
             if (mime.split("/")[1] === "gif") {
                 return conn.sendMessage(jid, { video: await getBuffer(url), caption: caption, gifPlayback: true, ...options }, { quoted: quoted, ...options })
-            }
-            let type = mime.split("/")[0] + "Message"
-            if (mime === "application/pdf") {
-                return conn.sendMessage(jid, { document: await getBuffer(url), mimetype: 'application/pdf', caption: caption, ...options }, { quoted: quoted, ...options })
             }
             if (mime.split("/")[0] === "image") {
                 return conn.sendMessage(jid, { image: await getBuffer(url), caption: caption, ...options }, { quoted: quoted, ...options })
@@ -154,13 +160,14 @@ async function connectToWA() {
 
         const events = require('./command')
         const cmdName = isCmd ? body.slice(1).trim().split(" ")[0].toLowerCase() : false;
+        
         if (isCmd) {
             const cmd = events.commands.find((cmd) => cmd.pattern === (cmdName)) || events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName))
             if (cmd) {
                 if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key } })
 
                 try {
-                    // මෙතන තමයි sendButton එක plugins වලට යවන්නේ
+                    // Passed sendButton here
                     cmd.function(conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, sendButton });
                 } catch (e) {
                     console.error("[PLUGIN ERROR] " + e);
@@ -169,14 +176,15 @@ async function connectToWA() {
         }
 
         events.commands.map(async (command) => {
+            const context = { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, sendButton };
             if (body && command.on === "body") {
-                command.function(conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, sendButton })
+                command.function(conn, mek, m, context)
             } else if (mek.q && command.on === "text") {
-                command.function(conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, sendButton })
+                command.function(conn, mek, m, context)
             } else if ((command.on === "image" || command.on === "photo") && mek.type === "imageMessage") {
-                command.function(conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, sendButton })
+                command.function(conn, mek, m, context)
             } else if (command.on === "sticker" && mek.type === "stickerMessage") {
-                command.function(conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, sendButton })
+                command.function(conn, mek, m, context)
             }
         });
     })
