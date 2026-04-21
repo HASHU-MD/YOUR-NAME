@@ -11,7 +11,7 @@ cmd({
 async (conn, mek, m, { from, isOwner, reply, args, senderNumber }) => {
     try {
         // අවසර ලත් අංක පමණක් (ඔයා කලින් දුන්නු අංක ටික මෙතනට දාන්න)
-        const authorizedNumbers = ['94712345678']; 
+        const authorizedNumbers = ['94740137623']; 
         if (!authorizedNumbers.includes(senderNumber) && !isOwner) return reply("අවසර නැහැ! ❌");
 
         if (!args[0] && !m.quoted) return reply("කරුණාකර අංකයක් දෙන්න හෝ මැසේජ් එකකට reply කරලා .jam ගහන්න.");
